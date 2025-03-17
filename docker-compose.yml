@@ -1,0 +1,161 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=true
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=Jarek
+      - POSTGRES_PASSWORD=Jarek  # Replace 'your_password' with a secure password.
+      - POSTGRES_DB=data
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:
+
+
+
+
+#version: '3.8'
+#
+#services:
+#  app:
+#    build: .
+#    volumes:
+#      - .:/usr/src/app
+#    working_dir: /usr/src/app
+#    command: python main.py
+#    depends_on:
+#      - database
+#    ports:
+#      - "8000:8000"
+#
+#  database:
+#    image: postgres:latest
+#    environment:
+#      - POSTGRES_USER=Jarek
+#      - POSTGRES_PASSWORD=Jarek
+#      - POSTGRES_DB=data
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#
+#volumes:
+#  postgres_data:
+#
+#
+####services:
+####  db:
+####    image: postgres:latest
+####    environment:
+####      - POSTGRES_PASSWORD=Jarek
+####      - POSTGRES_USER=Jarek
+####      - POSTGRES_DB=data
+####    ports:
+####      - "5432:5432"
+####    volumes:
+####      - postgres_data:/var/lib/postgresql/data
+####
+####  app:
+####    build: .  # This assumes Dockerfile is in the same directory
+####    depends_on:
+####      - db
+####    environment:
+####      - DATABASE_USER=Jarek
+####      - DATABASE_PASSWORD=Jarek
+####      - DATABASE_HOST=db  # Note: Changed from postgres to db to match service name
+####      - DATABASE_NAME=data
+####    volumes:
+####      - ./:/app
+####
+####volumes:
+####  postgres_data:
+####version: '3.8'
+####services:
+####  postgres:
+####    image: postgres:latest
+####    environment:
+####      POSTGRES_DB: data
+####      POSTGRES_USER: Jarek
+####      POSTGRES_PASSWORD: Jarek
+####    ports:
+####      - "5432:5432"
+####    volumes:
+####      - postgres_data:/var/lib/postgresql/data
+####
+####  app:
+####    build: .
+####    environment:
+####      - DATABASE_HOST=postgres
+####      - DATABASE_USER=Jarek
+####      - DATABASAE_PASSWORD=Jarek
+####      - DATABASE_NAME=data
+####    depends_on:
+####      - postgres
+####
+####volumes:
+####  postgres_data:
+###version: '3.8'
+###services:
+###  db:
+###    image: postgres:latest
+###    environment:
+###      - POSTGRES_PASSWORD=Jarek
+###      - POSTGRES_USER=Jarek
+###      - POSTGRES_DB=data
+###    ports:
+###      - "5432:5432"
+###    volumes:
+###      - postgres_data:/var/lib/postgresql/data
+###
+###  app:
+###    build: .
+###    depends_on:
+###      - db
+###    environment:
+###      - DATABASE_USER=Jarek
+###      - DATABASE_PASSWORD=Jarek
+###      - DATABASE_HOST=postgres
+###      - DATABASE_NAME=data
+###    volumes:
+###      - ./:/app
+###
+###volumes:
+###  postgres_data:
+##version: '3.8'
+##
+##services:
+##  app:
+##    build: .
+##    volumes:
+##      - .:/usr/src/app
+##    working_dir: /usr/src/app
+##    command: python main.py
+##    environment:
+##      - DATABASE_USER=${DATABASE_USER}
+##      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+##      - DATABASE_HOST=database
+##      - DATABASE_NAME=${DATABASE_NAME}
+##    depends_on:
+##      - database
+##    ports:
+##      - "8000:8000"
+##
+##  database:
+##    image: postgres:latest
+##    environment:
+##      - POSTGRES_USER=Jarek
+##      - POSTGRES_PASSWORD=Jarek
+##      - POSTGRES_DB=data
+##    volumes:
+##      - postgres_data:/var/lib/postgresql/data
+##
+##volumes:
+##  postgres_data:

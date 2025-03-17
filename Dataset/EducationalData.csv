@@ -1,11 +1,11 @@
 Full Name,Age,Education Level,Major,Year Started Education,Year Completed Education,Type of Educational Institution,Average Grade
 John Doe,22,Tertiary,Computer Science,2018,2022,Public,3.5
-Jane Smith,28,Secondary,N/A,2010,2014,Public,N/A
-Ahmed Khan,19,Secondary,N/A,2022,2026,Public,N/A
+Jane Smith,28,Secondary,Nothing,2010,2014,Public,0
+Ahmed Khan,19,Secondary,Nothing,2022,2026,Public,0
 Maria Garcia,34,Tertiary,Business Administration,2006,2010,Private,3.8
-Chen Wei,45,Tertiary,Engineering,1998,2002,Public,3.6
+Chen Wei,45,Tertiary,Engineering,1998,2002,Public,0
 Elena Petrova,26,Tertiary,Medicine,2015,2019,Private,3.9
-Michael Brown,31,Secondary,N/A,2008,2012,Public,N/A
+Michael Brown,31,Secondary,Nothing,2008,2012,Public,0
 Isabella Johnson,23,Tertiary,Biology,2020,2024,Private,3.7
 Raj Patel,37,Tertiary,Economics,2005,2009,Public,3.2
-Laura Wilson,29,Secondary,N/A,2012,2016,Public,N/A
+Laura Wilson,29,Secondary,Nothing,2012,2016,Public,0
