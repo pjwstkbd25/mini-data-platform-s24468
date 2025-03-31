@@ -13,7 +13,7 @@ services:
 
 
   db:
-    image: debezium/postgres:latest
+    image: debezium/postgres:15
     container_name: db
     ports:
       - "5433:5432"
@@ -68,9 +68,20 @@ services:
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_PLUGIN_PATH: /kafka/connect
     depends_on:
       - kafka
       - db
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKER_CONNECT: "kafka:9092"
+    depends_on:
+      - kafka
 
 volumes:
   pgdata:
