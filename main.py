@@ -7,7 +7,8 @@ from RandomData import insert_random_educational_data
 def get_engine():
     user = "Jarek"
     password = "Jarek"
-    host = "localhost"
+    # host = "localhost"
+    host = "db"
     database = "data"
     return create_engine(f'postgresql://{user}:{password}@{host}/{database}')
 
