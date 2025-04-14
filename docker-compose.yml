@@ -1,7 +1,8 @@
+version: '3.8'
 services:
   web:
     build: .
-    command: python main.py
+    command:  tail -f /dev/null  # <-- Zapobiega automatycznemu wyjściu kontenera python main.py
     ports:
       - "5000:5000"
     volumes:
@@ -23,16 +24,10 @@ services:
       POSTGRES_DB: data
     volumes:
       - pgdata:/var/lib/postgresql/data
-    command:
-      - "postgres"
-      - "-c"
-      - "wal_level=logical"
-      - "-c"
-      - "max_wal_senders=10"
-      - "-c"
-      - "max_replication_slots=10"
+    command: postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
     ports:
       - "2181:2181"
@@ -41,37 +36,61 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#
+#      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
+#
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     depends_on:
       - zookeeper
 
   connect:
-    image: debezium/connect:2.4
+    image: debezium/connect:2.5
     container_name: connect
     ports:
       - "8083:8083"
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: 1
-      CONFIG_STORAGE_TOPIC: debezium_connect_configs
-      OFFSET_STORAGE_TOPIC: debezium_connect_offsets
-      STATUS_STORAGE_TOPIC: debezium_connect_statuses
+#      CONFIG_STORAGE_TOPIC: debezium_connect_configs
+#      OFFSET_STORAGE_TOPIC: debezium_connect_offsets
+#      STATUS_STORAGE_TOPIC: debezium_connect_statuses
+      CONFIG_STORAGE_TOPIC: debezium_configs
+      OFFSET_STORAGE_TOPIC: debezium_offsets
+      STATUS_STORAGE_TOPIC: debezium_status
       KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       KEY_CONVERTER_SCHEMAS_ENABLE: "false"
-      CONNECT_PLUGIN_PATH: /kafka/connect
+#      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+#      CONNECT_PLUGIN_PATH: /kafka/connect
+      CONNECT_REST_ADVERTISED_HOST_NAME: debezium
     depends_on:
       - kafka
       - db
+
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
@@ -83,5 +102,15 @@ services:
     depends_on:
       - kafka
 
+  connector-init:
+    image: curlimages/curl:latest
+    container_name: connector_init
+    volumes:
+      - ./init-connector.sh:/init-connector.sh
+    command: ["sh", "/init-connector.sh"]
+    depends_on:
+      - connect
+      - kafka
+      - db
 volumes:
   pgdata:
