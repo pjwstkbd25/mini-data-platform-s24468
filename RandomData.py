@@ -19,9 +19,9 @@ def random_major():
     ])
 
 def random_years():
-    start_year = random.randint(1990, 2020)               # Education start year between 1990 and 2020
-    duration   = random.randint(2, 6)                     # Study duration between 2 to 6 years
-    end_year   = start_year + duration                    # end_year will always be >= start_year
+    start_year = random.randint(1990, 2020)
+    duration   = random.randint(2, 6)
+    end_year   = start_year + duration
     return start_year, end_year
 
 def random_institution_type():
@@ -41,12 +41,10 @@ def generate_random_educational_data(num_rows):
         "Type of Educational Institution": [random_institution_type() for _ in range(num_rows)],
         "Average Grade":             [random_grade() for _ in range(num_rows)]
     }
-    # Generate Year Started and Year Completed values for each entry
     for _ in range(num_rows):
         start, end = random_years()
         data["Year Started Education"].append(start)
         data["Year Completed Education"].append(end)
-    # At this point, Year Completed is always >= Year Started for each record
     return pd.DataFrame(data)
 
 def insert_random_educational_data(engine, table_name, num_rows):
