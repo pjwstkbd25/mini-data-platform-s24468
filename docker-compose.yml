@@ -1,116 +1,516 @@
-version: '3.8'
+##version: '3.8'
+##services:
+##  web:
+##    build: .
+##    command: >
+##      bash -c "
+##        python main.py &&            # 1️⃣ tworzenie tabel + insert
+##        flask run --host=0.0.0.0     # 2️⃣ uruchomienie API
+##      "
+##    ports:
+##      - "5000:5000"
+##    environment:
+##      - FLASK_APP=app.py
+##      - FLASK_ENV=development
+##    depends_on:
+##      - db
+##
+##
+##  db:
+##    image: debezium/postgres:15
+##    container_name: db
+##    ports:
+##      - "5433:5432"
+##    environment:
+##      POSTGRES_USER: Jarek
+##      POSTGRES_PASSWORD: Jarek
+##      POSTGRES_DB: data
+##    volumes:
+##      - pgdata:/var/lib/postgresql/data
+##    command: postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+##
+##  zookeeper:
+##    image: confluentinc/cp-zookeeper:7.5.0
+##    container_name: zookeeper
+##    ports:
+##      - "2181:2181"
+##    environment:
+##      ZOOKEEPER_CLIENT_PORT: 2181
+##      ZOOKEEPER_TICK_TIME: 2000
+##    healthcheck:
+##      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/2181"]
+##      interval: 10s
+##      timeout: 5s
+##      retries: 10
+##
+##  kafka:
+##    image: confluentinc/cp-kafka:7.5.0
+##    container_name: kafka
+##    restart: on-failure
+##    ports:
+##      - "9092:9092"
+##      - "29092:29092"
+##    environment:
+##      KAFKA_BROKER_ID: 1
+##      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+##      # daj ZooKeeperowi więcej czasu
+##      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+##      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+##      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
+##      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+##      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+##      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+##      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+##    depends_on:
+##      zookeeper:
+##        condition: service_healthy
+##    healthcheck:
+##      test: ["CMD", "bash", "-c", "nc -z localhost 9092"]
+##      interval: 10s
+##      timeout: 5s
+##      retries: 12
+##
+##  schema-registry:
+##    image: confluentinc/cp-schema-registry:7.5.0
+##    container_name: schema-registry
+##    restart: on-failure
+##    ports:
+##      - "8081:8081"
+##    environment:
+##      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+##      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+##      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+##    depends_on:
+##      kafka:
+##        condition: service_healthy
+##  connect:
+##    image: debezium/connect:2.5
+##    container_name: connect
+##    restart: on-failure
+##    ports:
+##      - "8083:8083"
+##    environment:
+##      BOOTSTRAP_SERVERS: kafka:9092
+##      GROUP_ID: 1
+##      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+##      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+##      KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+##      VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+##    depends_on:
+##      schema-registry:
+##        condition: service_healthy
+##  kafdrop:
+##    image: obsidiandynamics/kafdrop
+##    container_name: kafdrop
+##    restart: "no"
+##    ports:
+##      - "9000:9000"
+##    environment:
+##      KAFKA_BROKER_CONNECT: "kafka:9092"
+##    depends_on:
+##      - kafka
+##
+##  connector-init:
+##    image: curlimages/curl:latest
+##    container_name: connector_init
+##    volumes:
+##      - ./init-connector.sh:/init-connector.sh
+##    command: ["sh", "/init-connector.sh"]
+##    depends_on:
+##      - connect
+##      - kafka
+##      - db
+##volumes:
+##  pgdata:
+##
+###  zookeeper:
+###    image: confluentinc/cp-zookeeper:7.5.0
+###    container_name: zookeeper
+###    ports:
+###      - "2181:2181"
+###    environment:
+###      ZOOKEEPER_CLIENT_PORT: 2181
+###      ZOOKEEPER_TICK_TIME: 2000
+###  connect:
+###    image: debezium/connect:2.5
+###    container_name: connect
+###    ports:
+###      - "8083:8083"
+###    environment:
+###      BOOTSTRAP_SERVERS: kafka:9092
+###      GROUP_ID: 1
+###      CONFIG_STORAGE_TOPIC: debezium_configs
+###      OFFSET_STORAGE_TOPIC: debezium_offsets
+###      STATUS_STORAGE_TOPIC: debezium_status
+###      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+###      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+####      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+####      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+###      VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
+###      KEY_CONVERTER_SCHEMAS_ENABLE: "true"
+###      VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+###      KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+###      CONNECT_REST_ADVERTISED_HOST_NAME: debezium
+###    depends_on:
+###      - kafka
+###      - db
+##
+###  schema-registry:
+###    image: confluentinc/cp-schema-registry:7.5.0
+###    container_name: schema-registry     # <-- ważne: odpowiada URL-owi w Connect
+###    ports:
+###      - "8081:8081"
+###    environment:
+###      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+###      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+###      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+###    depends_on:
+###      - kafka
+##
+##
+###  kafka:
+###    image: confluentinc/cp-kafka:7.5.0
+###    container_name: kafka
+###    ports:
+###      - "9092:9092"
+###      - "29092:29092"
+###    environment:
+###      KAFKA_BROKER_ID: 1
+###      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+###      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+###      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
+###      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+###      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+###      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+###      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+###    depends_on:
+###      - zookeeper
+##
+##
+###  web:
+###    build: .
+###    command:  tail -f /dev/null  # <-- Zapobiega automatycznemu wyjściu kontenera python main.py
+###    ports:
+###      - "5000:5000"
+###    volumes:
+###      - .:/app
+###    depends_on:
+###      - db
+###    environment:
+###      - DEBUG=true
+#
+#
+#version: "3.8"
+#
+#services:
+################################################################################
+##  DATABASE (PostgreSQL 15 z włączoną replikacją logiczną)
+################################################################################
+#  db:
+#    image: debezium/postgres:15
+#    container_name: db
+#    ports:                    # host:container
+#      - "5433:5432"
+#    environment:
+#      POSTGRES_USER:     Jarek
+#      POSTGRES_PASSWORD: Jarek
+#      POSTGRES_DB:       data
+#    command: |
+#      postgres -c wal_level=logical \
+#               -c max_replication_slots=10 \
+#               -c max_wal_senders=10
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    restart: unless-stopped
+#
+################################################################################
+##  ZOOKEEPER (wymagany przez cp-kafka 7.5.0)
+################################################################################
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:7.5.0
+#    container_name: zookeeper
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#    ports:
+#      - "2181:2181"
+#    healthcheck:              # tylko sprawdzenie portu
+#      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/2181"]
+#      interval: 10s
+#      timeout:  5s
+#      retries:  12
+#    restart: unless-stopped
+#
+################################################################################
+##  KAFKA broker — pojedynczy, expose 29092 na hosta
+################################################################################
+#  kafka:
+#    image: confluentinc/cp-kafka:7.5.0
+#    container_name: kafka
+#    depends_on:
+#      - zookeeper             # wystarczy zwykłe depends_on
+#    ports:
+#      - "9092:9092"           # dla usług w sieci Docker
+#      - "29092:29092"         # dla klienta na hoście
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      # dwa listenery:
+#      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+#    restart: unless-stopped
+#
+################################################################################
+##  SCHEMA REGISTRY (AVRO)
+################################################################################
+#  schema-registry:
+#    image: confluentinc/cp-schema-registry:7.5.0
+#    container_name: schema-registry
+#    depends_on:
+#      - kafka
+#    environment:
+#      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+#      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+#      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+#    ports:
+#      - "8081:8081"
+#    restart: unless-stopped
+#
+################################################################################
+##  DEBEZIUM CONNECT (Avro converters)
+################################################################################
+#  connect:
+#    image: debezium/connect:2.5
+#    container_name: connect
+#    depends_on:
+#      - schema-registry
+#      - db
+#    environment:
+#      BOOTSTRAP_SERVERS: kafka:9092
+#      GROUP_ID: 1
+#      CONFIG_STORAGE_TOPIC: debezium_configs
+#      OFFSET_STORAGE_TOPIC: debezium_offsets
+#      STATUS_STORAGE_TOPIC: debezium_status
+#      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+#      KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+#      VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+#    ports:
+#      - "8083:8083"
+#    restart: unless-stopped
+#
+################################################################################
+##  KAFDROP — web GUI do podglądu topiców
+################################################################################
+#  kafdrop:
+#    image: obsidiandynamics/kafdrop
+#    container_name: kafdrop
+#    depends_on:
+#      - kafka
+#    environment:
+#      KAFKA_BROKER_CONNECT: kafka:9092
+#      SCHEMAREGISTRY_CONNECT: http://schema-registry:8081
+#    ports:
+#      - "9000:9000"
+#    restart: unless-stopped
+#
+################################################################################
+##  APLIKACJA PYTHON (Flask + loader CSV)
+################################################################################
+#  web:
+#    build: .
+#    command: |
+#      bash -c "python main.py && flask run --host=0.0.0.0"
+#    environment:
+#      FLASK_APP: app.py
+#      FLASK_ENV: development
+#    ports:
+#      - "5000:5000"
+#    depends_on:
+#      - db
+#    restart: unless-stopped
+#
+################################################################################
+##  Skrypt rejestrujący connector Debezium po starcie Connect
+################################################################################
+#  connector-init:
+#    image: curlimages/curl:latest
+#    container_name: connector_init
+#    volumes:
+#      - ./init-connector.sh:/init-connector.sh
+#    entrypoint: ["sh", "/init-connector.sh"]
+#    depends_on:
+#      - connect
+#      - db
+#      - kafka
+#    restart: "no"
+#
+#volumes:
+#  pgdata:
+version: "3.8"
+
 services:
-  web:
-    build: .
-    command:  tail -f /dev/null  # <-- Zapobiega automatycznemu wyjściu kontenera python main.py
-    ports:
-      - "5000:5000"
-    volumes:
-      - .:/app
-    depends_on:
-      - db
-    environment:
-      - DEBUG=true
-
-
+  ###############################################################################
+  #  DATABASE (PostgreSQL 15 with logical replication enabled)
+  ###############################################################################
   db:
     image: debezium/postgres:15
     container_name: db
-    ports:
+    ports: # host:container
       - "5433:5432"
     environment:
       POSTGRES_USER: Jarek
       POSTGRES_PASSWORD: Jarek
       POSTGRES_DB: data
+      POSTGRES_HOST_AUTH_METHOD: md5     #  ← NOWA linia
+    command: postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
     volumes:
       - pgdata:/var/lib/postgresql/data
-    command: postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+    restart: unless-stopped
 
+  ###############################################################################
+  #  ZOOKEEPER (required by cp-kafka 7.5.0)
+  ###############################################################################
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
-    ports:
-      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    healthcheck: # minimal port check (no netcat)
+      test: [ "CMD", "bash", "-c", "echo > /dev/tcp/localhost/2181" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
 
+  ###############################################################################
+  #  KAFKA BROKER — single node, expose 29092 for host access
+  ###############################################################################
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
+    depends_on:
+      - zookeeper             # simple depends_on (ZK container must start first)
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "9092:9092"           # for services within the Docker network
+      - "29092:29092"         # for clients on the host (outside Docker)
     environment:
-#      KAFKA_BROKER_ID: 1
-#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#
-#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#
-#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-#
-#      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
-#
-#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Two listeners: one for internal Docker network, one for host
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    depends_on:
-      - zookeeper
+    restart: unless-stopped
 
-  connect:
-    image: debezium/connect:2.5
-    container_name: connect
-    ports:
-      - "8083:8083"
-    environment:
-      BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: 1
-#      CONFIG_STORAGE_TOPIC: debezium_connect_configs
-#      OFFSET_STORAGE_TOPIC: debezium_connect_offsets
-#      STATUS_STORAGE_TOPIC: debezium_connect_statuses
-      CONFIG_STORAGE_TOPIC: debezium_configs
-      OFFSET_STORAGE_TOPIC: debezium_offsets
-      STATUS_STORAGE_TOPIC: debezium_status
-      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
-#      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-#      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-#      CONNECT_PLUGIN_PATH: /kafka/connect
-      CONNECT_REST_ADVERTISED_HOST_NAME: debezium
+  ###############################################################################
+  #  SCHEMA REGISTRY (for AVRO support)
+  ###############################################################################
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: schema-registry
     depends_on:
+      - kafka
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  ###############################################################################
+  #  KAFKA CONNECT (Debezium Connect with Avro converters)
+  ###############################################################################
+  connect:
+    build: # build custom image with Debezium plugin
+      context: .
+      dockerfile: Dockerfile.connect
+    container_name: connect
+    depends_on:
+      - schema-registry
       - kafka
       - db
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    restart: "no"
-    ports:
-      - "9000:9000"
     environment:
-      KAFKA_BROKER_CONNECT: "kafka:9092"
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect     #  ← NOWA             🟢
+      # ---- internal topics ----
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1     #  ← NOWA
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1     #  ← NOWA
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1     #  ← NOWA
+      CONNECT_CONFIG_STORAGE_PARTITIONS: 1             #  ← NOWA (opcjonalnie)
+      CONNECT_OFFSET_STORAGE_PARTITIONS: 1
+      CONNECT_STATUS_STORAGE_PARTITIONS: 1
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_GROUP_ID: "1"
+      CONNECT_CONFIG_STORAGE_TOPIC: debezium_configs
+      CONNECT_OFFSET_STORAGE_TOPIC: debezium_offsets
+      CONNECT_STATUS_STORAGE_TOPIC: debezium_status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_PLUGIN_PATH: "/usr/share/confluent-hub-components"   # path for plugins (Debezium)
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+
+  ###############################################################################
+  #  KAFDROP — web GUI for viewing Kafka topics (with Schema Registry integration)
+  ###############################################################################
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
     depends_on:
       - kafka
+    environment:
+      KAFKA_BROKER_CONNECT: kafka:9092
+      SCHEMAREGISTRY_CONNECT: http://schema-registry:8081
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
 
+  ###############################################################################
+  #  PYTHON APPLICATION (Flask app + CSV loader)
+  ###############################################################################
+  web:
+    build: .
+    container_name: web
+    command: |
+      bash -c "python main.py && flask run --host=0.0.0.0"
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  ###############################################################################
+  #  CONNECTOR INIT SCRIPT (register Debezium connector after Connect starts)
+  ###############################################################################
   connector-init:
     image: curlimages/curl:latest
     container_name: connector_init
     volumes:
-      - ./init-connector.sh:/init-connector.sh
-    command: ["sh", "/init-connector.sh"]
+      - ./init-connector.sh:/init-connector.sh        # shell script to register connector
+      - ./init-connector.json:/init-connector.json    # connector configuration in JSON
+    entrypoint: [ "sh", "/init-connector.sh" ]
     depends_on:
       - connect
-      - kafka
       - db
+      - kafka
+    restart: "no"
+
 volumes:
   pgdata:

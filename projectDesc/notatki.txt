@@ -5,3 +5,12 @@ W pgadmin zrobić insert do "eduational_data"
 zobaczyć zmianę w data_source.public.educational_data
 
 http://localhost:9000 -> kafkadrop
+
+
+
+
+PIERWSZE KROKI JAKIE SIĘ ROBI PO POPRAWNYM ŚCIĄGNIĘCIU PROJEKTU:
+
+
+- pierwszy raz:
+docker compose up -d --build     # pierwszy raz

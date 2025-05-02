@@ -1,68 +1,68 @@
+import time
 import pandas as pd
-from sqlalchemy import create_engine, Integer, Float, Text, DateTime
-from sqlalchemy.engine import reflection
+from sqlalchemy import create_engine, Integer, Float, Text, DateTime, Boolean, inspect, text
 from RandomData import insert_random_educational_data
-
 
 def get_engine():
     user = "Jarek"
     password = "Jarek"
-    # host = "localhost"
-    host = "db"
+    host = "db"       # changed to Docker container hostname for PostgreSQL
+    port = 5432       # default Postgres port inside container
     database = "data"
-    return create_engine(f'postgresql://{user}:{password}@{host}/{database}')
+    return create_engine(f'postgresql://{user}:{password}@{host}:{port}/{database}')
 
-
-def infer_data_type(val):
-    if pd.api.types.is_integer_dtype(val):
+def infer_data_type(series: pd.Series):
+    """
+    Determine the SQLAlchemy type for an entire Pandas series (column).
+    This uses the dtype of the series (not a single value) to avoid misclassification.
+    - Booleans -> Boolean
+    - Integers -> Integer
+    - Floats   -> Float
+    - Date/time -> DateTime
+    - Otherwise -> Text (treat as text/varchar)
+    """
+    if pd.api.types.is_bool_dtype(series):
+        return Boolean()
+    if pd.api.types.is_integer_dtype(series):
         return Integer()
-    elif pd.api.types.is_float_dtype(val):
+    if pd.api.types.is_float_dtype(series):
         return Float()
-    elif pd.api.types.is_datetime64_any_dtype(val):
+    if pd.api.types.is_datetime64_any_dtype(series):
         return DateTime()
-    else:
-        return Text()
+    # default: treat as text
+    return Text()
 
-
-def create_and_insert_data(file_path, table_name):
-    """Creates a table and inserts data only if the table does not exist."""
+def create_and_insert_data(csv_path, table_name):
+    """Creates a table and inserts data from a CSV, then adds a primary key if table is new."""
     engine = get_engine()
+    # Wait until the database is ready to accept connections
+    print(f"Connecting to database to create {table_name}...")
+    for attempt in range(30):
+        try:
+            with engine.connect() as _:
+                break  # connection successful
+        except Exception as e:
+            print("Database not ready, waiting...")
+            time.sleep(1)
+    else:
+        raise RuntimeError("Database not available after 30 seconds.")
+    print(f"Database connection established. Creating and inserting data for '{table_name}'...")
 
-    if check_table_exists(engine, table_name):
-        print(f"Skipping table creation for {table_name} (already exists).")
-        return  # If table exists, skip creation
+    # Read CSV data into pandas DataFrame
+    data = pd.read_csv(csv_path)
+    # Map each DataFrame column to an SQLAlchemy type based on its dtype
+    dtype_mapping = {col: infer_data_type(data[col]) for col in data.columns}
 
-    print(f"Creating and inserting data for {table_name}...")
-    data = pd.read_csv(file_path)
-
-    dtype_mapping = {
-        col: infer_data_type(data[col].dropna().iloc[0])
-        for col in data.columns
-    }
-
+    # Create table and insert data (if table exists, replace it)
+    data.to_sql(name=table_name, con=engine, if_exists='replace', index=False, dtype=dtype_mapping)
+    # Add a serial primary key column named 'id'
     with engine.connect() as connection:
-        data.to_sql(
-            name=table_name,
-            con=engine,
-            if_exists='replace',
-            index=False,
-            dtype=dtype_mapping
-        )
-
-
-def check_table_exists(engine, table_name):
-    """Checks if a table exists in the database."""
-    inspector = reflection.Inspector.from_engine(engine)
-    return table_name in inspector.get_table_names()
-
+        connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN id SERIAL PRIMARY KEY;"))
+    print(f"Table '{table_name}' created and CSV data inserted.")
 
 if __name__ == '__main__':
     engine = get_engine()
-
-    # Only create and insert data if the tables do not exist
+    # create_and_insert_data('educational_data.csv', 'educational_data')
     create_and_insert_data('Dataset/EducationalData.csv', 'educational_data')
-    create_and_insert_data('Dataset/AddictionData.csv', 'addiction_data')
-    create_and_insert_data('Dataset/InvestmentData.csv', 'investment_data')
-
-    # Insert random data (this can always run)
     insert_random_educational_data(engine, 'educational_data', 10)
+    print("Random data inserted into 'educational_data'.")
