@@ -14,3 +14,26 @@ PIERWSZE KROKI JAKIE SIĘ ROBI PO POPRAWNYM ŚCIĄGNIĘCIU PROJEKTU:
 
 - pierwszy raz:
 docker compose up -d --build     # pierwszy raz
+
+
+INSERT INTO:
+
+SELECT * FROM educational_data;
+INSERT INTO "educational_data"
+    ("Full Name",
+     "Age",
+     "Education Level",
+     "Major",
+     "Year Started Education",
+     "Year Completed Education",
+     "Type of Educational Institution",
+     "Average Grade")
+VALUES
+    ('John DoeAAAAAAA',
+     22,
+     'Tertiary',
+     'Computer Science',
+     2018,
+     2022,
+     'Public',
+     3.5);
