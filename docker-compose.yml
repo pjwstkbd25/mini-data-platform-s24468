@@ -158,6 +158,23 @@ services:
       - db
       - kafka
     restart: "no"
-
+###############################################################################
+#  APACHE SPARK 3.5  – pojedynczy master uruchomiony w tle
+###############################################################################
+  spark:
+    image: bitnami/spark:3.5.0        # lekka, gotowa do pracy
+    container_name: spark
+    depends_on:
+      - kafka                         # Spark → Kafka
+    environment:
+      - SPARK_MODE=master             # ← to trzyma proces przy życiu
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_UI_PORT=4040            # UI dostępne na hoście
+    ports:
+      - "4040:4040"                   # http://localhost:4040
+    volumes:
+      - ./spark-jobs:/opt/spark-jobs  # nasze skrypty wewnątrz kontenera
+    restart: unless-stopped
 volumes:
   pgdata:
