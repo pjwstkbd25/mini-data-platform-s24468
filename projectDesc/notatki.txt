@@ -5,7 +5,7 @@ W pgadmin zrobić insert do "eduational_data"
 zobaczyć zmianę w data_source.public.educational_data
 
 http://localhost:9000 -> kafkadrop
-
+http://localhost:4040/jobs/
 
 
 
@@ -44,8 +44,9 @@ VALUES
 
 
 
+ curl.exe -s "http://localhost:8081/subjects/data_source.public.educational_data-value/versions/latest" | python -m json.tool
 
-
+curl.exe -s "http://localhost:8081/subjects/data_source.public.educational_data-value/versions/latest" ^ | python -c "import sys, json, pprint; outer=json.load(sys.stdin); pprint.pp(json.loads(outer['schema']))"
 
 
      # build & (if spark not yet running) start the stack

@@ -159,22 +159,28 @@ services:
       - kafka
     restart: "no"
 ###############################################################################
-#  APACHE SPARK 3.5  – pojedynczy master uruchomiony w tle
+#  SPARK – master-only, odpala nasz job przy starcie
 ###############################################################################
   spark:
-    image: bitnami/spark:3.5.0        # lekka, gotowa do pracy
+    image: bitnami/spark:3.5.0
     container_name: spark
     depends_on:
-      - kafka                         # Spark → Kafka
-    environment:
-      - SPARK_MODE=master             # ← to trzyma proces przy życiu
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_UI_PORT=4040            # UI dostępne na hoście
+      - kafka
     ports:
-      - "4040:4040"                   # http://localhost:4040
+      - "4040:4040"                               # UI
     volumes:
-      - ./spark-jobs:/opt/spark-jobs  # nasze skrypty wewnątrz kontenera
+      - ./spark-jobs:/opt/spark-jobs              # skrypty w kontenerze
+    command:                                      # <-- LIST-FORM!
+      - "/opt/bitnami/spark/bin/spark-submit"
+      - "--packages"
+      - "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0"
+      - "/opt/spark-jobs/kafka_avro_transform.py"
+    environment:
+      SPARK_MODE: master
+      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
+      SPARK_RPC_ENCRYPTION_ENABLED:     "no"
+      SPARK_UI_PORT:                    "4040"
     restart: unless-stopped
+
 volumes:
   pgdata:
