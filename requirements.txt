@@ -3,3 +3,5 @@ pandas~=2.2.3
 SQLAlchemy~=2.0.40
 numpy>=1.24,<2.2
 psycopg2-binary
+confluent-kafka==2.10.0 #2.4.0
+pyspark~=3.5.5

@@ -13,8 +13,8 @@ PIERWSZE KROKI JAKIE SIĘ ROBI PO POPRAWNYM ŚCIĄGNIĘCIU PROJEKTU:
 
 
 - pierwszy raz:
+docker compose down -v        # zatrzymaj stare kontenery
 docker compose up -d --build     # pierwszy raz
-
 
 INSERT INTO:
 
@@ -39,6 +39,17 @@ VALUES
      3.5);
 
 
+POKAZUJE ZMIANY SPARKA (tak samo jak docker desktop):
+docker logs -f spark
+
+
+
+
+
+
+
+
+
 
 
 
@@ -54,3 +65,8 @@ docker compose up -d --build
 
 
 docker compose exec spark spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0 /opt/spark-jobs/kafka_avro_transform.py
+
+
+
+NAJWIUEKZY PROBLEM TERAZ!!!
+spark  | ModuleNotFoundError: No module named 'confluent_kafka'
