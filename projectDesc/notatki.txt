@@ -44,11 +44,17 @@ docker logs -f spark
 
 
 
+MinIO dostępne na http://localhost:9101 (login: minioadmin),
+PAMIETAJ ŻEBY ZROBIĆ SOBIE BUCKETA JEŚLI GO NIE MASZ -> polecam nazwę "spark-output"
+
+możesz zawsze w command linie sprawdzić jak się dodają nowe rzeczy:
+najpierw musisz wpisać:
+.\mc.exe alias set local http://localhost:9100 minioadmin minioadmin
+a potem:
+ .\mc ls --recursive local/spark-output/educational-data
 
 
-
-
-
+gdyby było jakieś problemy z MinIO consoli
 
 
 
@@ -65,8 +71,3 @@ docker compose up -d --build
 
 
 docker compose exec spark spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0 /opt/spark-jobs/kafka_avro_transform.py
-
-
-
-NAJWIUEKZY PROBLEM TERAZ!!!
-spark  | ModuleNotFoundError: No module named 'confluent_kafka'
