@@ -158,30 +158,10 @@ services:
       - db
       - kafka
     restart: "no"
+
   ###############################################################################
-  #  SPARK – master-only, odpala nasz job przy starcie
+  #  SPARK
   ###############################################################################
-  #  spark:
-  #    image: bitnami/spark:3.5.0
-  #    container_name: spark
-  #    depends_on:
-  #      - kafka
-  #    ports:
-  #      - "4040:4040"                               # UI
-  #    volumes:
-  #      - ./spark-jobs:/opt/spark-jobs              # skrypty w kontenerze
-  #    command: # <-- LIST-FORM!
-  #      - "/opt/bitnami/spark/bin/spark-submit"
-  #      - "--packages"
-  #      - "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0"
-  #      - "/opt/spark-jobs/kafka_avro_transform.py"
-  #    environment:
-  #      SPARK_MODE: master
-  #      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
-  #      SPARK_RPC_ENCRYPTION_ENABLED: "no"
-  #      SPARK_UI_PORT: "4040"
-  #      PIP_PACKAGES: confluent-kafka==2.10.0
-  #    restart: unless-stopped
   spark:
     image: bitnami/spark:3.5.0
     container_name: spark
@@ -197,6 +177,10 @@ services:
       - "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0,io.delta:delta-spark_2.12:3.0.0,org.apache.hadoop:hadoop-aws:3.3.4"
       - "--conf=spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension"
       - "--conf=spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog"
+      - "--conf=spark.hadoop.fs.s3a.access.key=minioadmin"
+      - "--conf=spark.hadoop.fs.s3a.secret.key=minioadmin"
+      - "--conf=spark.hadoop.fs.s3a.endpoint=http://minio:9000"
+      - "--conf=spark.hadoop.fs.s3a.path.style.access=true"
       - "/opt/spark-jobs/kafka_avro_transform.py"
     environment:
       SPARK_MODE: master

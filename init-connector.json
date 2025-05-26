@@ -12,7 +12,7 @@
     "slot.name": "debezium_slot",
     "publication.autocreate.mode": "filtered",
     "schema.include.list": "public",
-    "table.include.list": "public.educational_data",
+    "table.include.list": "public.educational_data,public.addiction_data,public.investment_data",
     "topic.prefix": "data_source",
     "key.converter": "io.confluent.connect.avro.AvroConverter",
     "value.converter": "io.confluent.connect.avro.AvroConverter",

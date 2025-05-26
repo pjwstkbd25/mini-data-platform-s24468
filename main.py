@@ -61,7 +61,8 @@ def create_and_insert_data(csv_path, table_name):
 
 if __name__ == '__main__':
     engine = get_engine()
-    # create_and_insert_data('Dataset/EducationalData.csv', 'educational_data')
     create_and_insert_data('educational_data.csv', 'educational_data')
+    create_and_insert_data('addiction_data.csv', 'addiction_data')
+    create_and_insert_data('investment_data.csv', 'investment_data')
     insert_random_educational_data(engine, 'educational_data', 10)
     print("Random data inserted into 'educational_data'.")
