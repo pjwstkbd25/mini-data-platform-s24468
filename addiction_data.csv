@@ -9,3 +9,15 @@ George King,24,Georgia,Monthly,2,No,No,Unemployed,High School,Yes
 Hannah Lee,38,Michigan,Daily,7,Yes,Yes,Employed,College,No
 Ian Moore,33,Arizona,Rarely,6,No,No,Unemployed,Master,Yes
 Julia Cruz,26,New Jersey,Weekly,1,Yes,Yes,Employed,Bachelor,No
+
+
+
+flask~=3.1.0
+pandas~=2.2.3
+SQLAlchemy~=2.0.40
+numpy>=1.24,<2.2
+psycopg2-binary
+confluent-kafka==2.10.0 #2.4.0
+pyspark~=3.5.5
+
+docker compose run --rm airflow-webserver bash -lc "airflow users create --username airflow --password airflow --firstname Admin --lastname User --role Admin --email admin@example.com"
