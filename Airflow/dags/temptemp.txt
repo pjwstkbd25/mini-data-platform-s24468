@@ -169,3 +169,10 @@ def run_datagen():
 
 if __name__ == "__main__":
     run_datagen()
+
+
+
+
+
+
+SELECT COUNT(*) FROM public.kaggle_final_depression_dataset_1;

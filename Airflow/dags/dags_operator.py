@@ -7,7 +7,6 @@ AIRFLOW_HOME = "/opt/airflow"
 DAGS_DIR     = f"{AIRFLOW_HOME}/dags"
 SECRETS_DIR  = f"{AIRFLOW_HOME}/secrets"
 DATASETS_DIR = f"{AIRFLOW_HOME}/data/datasets"
-SCRIPT_PATH  = f"{DAGS_DIR}/datagen.py"
 
 default_args = {"owner": "airflow", "retries": 1, "retry_delay": timedelta(minutes=2)}
 
@@ -30,21 +29,13 @@ with DAG(
         ),
     )
 
-    run_datagen = BashOperator(
-        task_id="run_datagen",
-        bash_command=f'python "{SCRIPT_PATH}"',
-        env={
-            "KAGGLE_CONFIG_DIR": SECRETS_DIR,
-            "KAGGLE_DEST_DIR": DATASETS_DIR,
-            "KAGGLE_DATASET": "sumansharmadataworld/depression-surveydataset-for-analysis",
-            "KAGGLE_FILES": "",
-            "PG_HOST": "host.docker.internal",
-            "PG_PORT": "5433",
-            "PG_USER": "Jarek",
-            "PG_PASSWORD": "Jarek",
-            "PG_DB": "data",
-            "PG_SCHEMA": "public",
-        },
+    download_data = BashOperator(
+        task_id="download_data",
+        bash_command=f'python "{DAGS_DIR}/download_data.py"',
+    )
+    transform_to_postgresql = BashOperator(
+        task_id="transform_to_postgresql",
+        bash_command=f'python "{DAGS_DIR}/transform_to_postgresql.py"',
     )
 
-    make_dirs >> run_datagen
+    make_dirs >> download_data >>transform_to_postgresql
