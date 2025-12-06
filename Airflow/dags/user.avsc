@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "User",
+  "namespace": "pl.pjatk.demo",
+  "fields": [
+    { "name": "id", "type": "string" },
+    { "name": "email", "type": "string" },
+    { "name": "full_name", "type": "string" },
+    { "name": "signup_ts", "type": { "type": "long", "logicalType": "timestamp-millis" } }
+  ]
+}

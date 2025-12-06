@@ -1,0 +1,22 @@
+{
+  "name": "postgres-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "db",
+    "database.port": "5432",
+    "database.user": "Jarek",
+    "database.password": "Jarek",
+    "database.dbname": "data",
+    "database.server.name": "data_server",
+    "plugin.name": "pgoutput",
+    "slot.name": "debezium_slot",
+    "publication.autocreate.mode": "filtered",
+    "schema.include.list": "public",
+    "table.include.list": "public.educational_data,public.addiction_data,public.investment_data",
+    "topic.prefix": "data_source",
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter.schema.registry.url": "http://schema-registry:8081"
+  }
+}

@@ -1,0 +1,6 @@
+kaggle
+pandas
+SQLAlchemy
+psycopg2-binary
+python-dotenv
+apache-airflow-providers-docker==4.4.3

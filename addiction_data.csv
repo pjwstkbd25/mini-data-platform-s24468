@@ -1,0 +1,23 @@
+Full Name,Age,State,Frequency of Use,Years Using,Tried Quitting,Treatment Sought,Employment Status,Education Level,Family History of Addiction
+Alice Johnson,29,California,Daily,5,Yes,Yes,Employed,College,No
+Bob Smith,22,New York,Weekly,2,No,No,Unemployed,High School,Yes
+Carlos Diaz,35,Texas,Monthly,10,Yes,Yes,Employed,Bachelor,No
+Diana Ross,27,Florida,Daily,3,Yes,No,Unemployed,High School,Yes
+Evan Wright,42,Ohio,Rarely,1,No,No,Employed,Bachelor,Yes
+Fiona Chen,31,Washington,Weekly,4,Yes,Yes,Employed,Bachelor,No
+George King,24,Georgia,Monthly,2,No,No,Unemployed,High School,Yes
+Hannah Lee,38,Michigan,Daily,7,Yes,Yes,Employed,College,No
+Ian Moore,33,Arizona,Rarely,6,No,No,Unemployed,Master,Yes
+Julia Cruz,26,New Jersey,Weekly,1,Yes,Yes,Employed,Bachelor,No
+
+
+
+flask~=3.1.0
+pandas~=2.2.3
+SQLAlchemy~=2.0.40
+numpy>=1.24,<2.2
+psycopg2-binary
+confluent-kafka==2.10.0 #2.4.0
+pyspark~=3.5.5
+
+docker compose run --rm airflow-webserver bash -lc "airflow users create --username airflow --password airflow --firstname Admin --lastname User --role Admin --email admin@example.com"
