@@ -3,7 +3,10 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 DEFAULT_ARGS = {"owner": "airflow", "retries": 0}
-
+AIRFLOW_HOME = "/opt/airflow"
+SECRETS_DIR  = f"{AIRFLOW_HOME}/secrets"
+DATASETS_DIR = f"{AIRFLOW_HOME}/data/datasets"
+TASKS_DIR = f"{AIRFLOW_HOME}/tasks"
 with DAG(
     dag_id="debezium_register_connector",
     start_date=datetime(2025, 1, 1),
@@ -21,7 +24,7 @@ with DAG(
     register = BashOperator(
         task_id="register_connector",
         bash_command='curl -v -X PUT -H "Content-Type: application/json" '
-                     '--data-binary @/opt/airflow/secrets/debezium-pg.json '
+                     f'--data-binary @{SECRETS_DIR}/debezium-pg.json '
                      'http://connect:8083/connectors/pg-source/config'
     )
 

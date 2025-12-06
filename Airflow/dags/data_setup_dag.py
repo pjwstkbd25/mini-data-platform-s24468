@@ -7,6 +7,7 @@ AIRFLOW_HOME = "/opt/airflow"
 DAGS_DIR     = f"{AIRFLOW_HOME}/dags"
 SECRETS_DIR  = f"{AIRFLOW_HOME}/secrets"
 DATASETS_DIR = f"{AIRFLOW_HOME}/data/datasets"
+TASKS_DIR = f"{AIRFLOW_HOME}/tasks"
 
 default_args = {"owner": "airflow", "retries": 1, "retry_delay": timedelta(minutes=2)}
 
@@ -31,11 +32,11 @@ with DAG(
 
     download_data = BashOperator(
         task_id="download_data",
-        bash_command=f'python "{DAGS_DIR}/download_data.py"',
+        bash_command=f'python "{TASKS_DIR}/download_data.py"',
     )
     transform_to_postgresql = BashOperator(
         task_id="transform_to_postgresql",
-        bash_command=f'python "{DAGS_DIR}/transform_to_postgresql.py"',
+        bash_command=f'python "{TASKS_DIR}/transform_to_postgresql.py"',
     )
 
     make_dirs >> download_data >>transform_to_postgresql

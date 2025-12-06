@@ -36,7 +36,7 @@ def main() -> None:
     schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 
     # 2) schema
-    user_schema_str = load_avro_schema_str("user.avsc")
+    user_schema_str = load_avro_schema_str("../dags/user.avsc")
 
     # 3) serializer
     avro_serializer = AvroSerializer(
