@@ -7,7 +7,7 @@ AIRFLOW_HOME = "/opt/airflow"
 DAGS_DIR     = f"{AIRFLOW_HOME}/dags"
 SECRETS_DIR  = f"{AIRFLOW_HOME}/secrets"
 DATASETS_DIR = f"{AIRFLOW_HOME}/data/datasets"
-TASKS_DIR = f"{AIRFLOW_HOME}/tasks"
+TASKS_DIR = f"{AIRFLOW_HOME}/jobs"
 
 default_args = {"owner": "airflow", "retries": 1, "retry_delay": timedelta(minutes=2)}
 

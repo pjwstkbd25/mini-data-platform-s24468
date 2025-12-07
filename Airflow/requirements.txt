@@ -4,3 +4,5 @@ SQLAlchemy
 psycopg2-binary
 python-dotenv
 apache-airflow-providers-docker==4.4.3
+pyspark==3.5.5
+great_expectations
