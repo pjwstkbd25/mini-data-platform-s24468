@@ -1,0 +1,61 @@
+{
+  "expectations": [
+    {
+      "id": "d6c95271-258a-4ee3-a0ac-a181b31e98a3",
+      "kwargs": {
+        "min_value": 1
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_table_row_count_to_be_between"
+    },
+    {
+      "id": "8026f238-1071-4a8f-b0ca-89e9c7ce4d50",
+      "kwargs": {
+        "column": "label"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "f381985f-a3b0-4295-bdc2-372b8a8c3c91",
+      "kwargs": {
+        "column": "label",
+        "value_set": [
+          0,
+          1,
+          0.0,
+          1.0
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "8c9c044f-073b-43d3-99de-dc9ce76e2e39",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "abaebc61-ccc9-4576-8481-36d5e840249c",
+      "kwargs": {
+        "column": "label"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    }
+  ],
+  "id": "2851a6f5-01aa-4bd7-88eb-b10e0ccc3385",
+  "meta": {
+    "great_expectations_version": "1.9.2"
+  },
+  "name": "gold_mental_health_suite",
+  "notes": null
+}

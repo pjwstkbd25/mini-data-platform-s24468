@@ -4,7 +4,6 @@ from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 from pyspark.ml.feature import StringIndexer, OneHotEncoder
 import sys
 
-# --- ŚCIEŻKI ---
 BRONZE_PATH = "/opt/airflow/data/datalake/bronze/mental_health"
 SILVER_PATH = "/opt/airflow/data/datalake/silver/mental_health"
 
@@ -26,11 +25,8 @@ def run_job():
         print(f"!!! Błąd odczytu: {e}")
         sys.exit(1)
 
-    # 2. Parsowanie JSON (payload.after)
     df_json = df.withColumn("after_json", get_json_object(col("kafka_value"), "$.payload.after"))
 
-    # 3. Schemat danych (Dostosowany do wielkości liter z CSV!)
-    # Debezium wysyła klucze tak jak są w bazie. Skoro Pandas wgrał je jako "Name", musimy tu użyć "Name".
     survey_schema = StructType([
         StructField("Name", StringType(), True),
         StructField("Gender", StringType(), True),
@@ -55,41 +51,30 @@ def run_job():
         StructField("id", IntegerType(), True)
     ])
 
-    # Rozpakowanie JSON
     df_parsed = df_json.select(
         from_json(col("after_json"), survey_schema).alias("data")
     ).select("data.*")
 
-    # --- NORMALIZACJA NAZW KOLUMN ---
-    # Zmieniamy nazwy kolumn na małe litery ("Name" -> "name"), żeby łatwiej się pracowało
     for column_name in df_parsed.columns:
         df_parsed = df_parsed.withColumnRenamed(column_name, column_name.lower())
 
     print(">>> Próbka danych po naprawie schematu:")
     df_parsed.show(5)
 
-    # Sprawdzenie czy mamy dane (jeśli nadal są NULLe, przerywamy)
     if df_parsed.filter(col("name").isNotNull()).count() == 0:
         print("!!! ERROR: Nadal same NULLe. Sprawdź dokładnie nazwy pól w JSONie.")
-        # Opcjonalnie: odkomentuj linię niżej, żeby zobaczyć surowy JSON w logach i znaleźć literówkę
-        # df_json.select("after_json").show(1, truncate=False)
         sys.exit(1)
 
-    # 4. Feature Engineering / Cleaning
 
-    # Dodanie Region
     df_region = df_parsed.withColumn(
         "region",
         when(col("city").isNotNull(), "Asia").otherwise("Unknown")
     )
 
-    # Drop niepotrzebnych kolumn
     df_clean = df_region.drop("name", "city", "id")
 
-    # Filtrowanie (teraz używamy małych liter, bo zrobiliśmy rename pętlą wyżej)
     df_clean = df_clean.filter(col("age").between(15, 100))
 
-    # 5. ML Features: StringIndexer + OneHotEncoder
     categorical_cols = [
         "gender",
         "working professional or student",
@@ -113,7 +98,6 @@ def run_job():
         model = indexer.fit(df_processed)
         df_processed = model.transform(df_processed)
 
-    # One Hot Encoder
     ohe = OneHotEncoder(
         inputCols=[c + "_idx" for c in categorical_cols],
         outputCols=[c + "_vec" for c in categorical_cols]
@@ -124,7 +108,6 @@ def run_job():
     print(">>> Wynikowe dane (Silver):")
     df_final.select("age", "gender", "gender_vec", "depression").show(5)
 
-    # 6. Zapis do Silver
     print(f">>> Zapisywanie do: {SILVER_PATH}")
     (
         df_final.write

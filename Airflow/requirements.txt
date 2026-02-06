@@ -6,3 +6,9 @@ python-dotenv
 apache-airflow-providers-docker==4.4.3
 pyspark==3.5.5
 great_expectations
+scikit-learn
+mlflow==2.18.0
+numpy
+fastapi
+uvicorn
+requests

@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "9181520b-4b41-414e-bb2a-83f3ccf21bd2",
+      "name": "gold_mental_health_asset"
+    },
+    "batch_definition": {
+      "id": "b938be87-6898-48fd-89d7-3e7dbc4dcdc4",
+      "name": "gold_batch_def"
+    },
+    "datasource": {
+      "id": "7b326df9-a5ae-4116-9d1d-ef8c8d1a5355",
+      "name": "gold_datasource"
+    }
+  },
+  "id": "b67573fa-7ab7-4a41-b5d0-a9bcd196e934",
+  "name": "gold_validation_run",
+  "suite": {
+    "id": "2851a6f5-01aa-4bd7-88eb-b10e0ccc3385",
+    "name": "gold_mental_health_suite"
+  }
+}

@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 
 # -------------------- Env / Paths --------------------
-# BASE_DIR -> folder "Airflow"
 BASE_DIR = Path(__file__).resolve().parents[1]
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
@@ -24,19 +23,16 @@ def resolve_env_path(var_name: str, default_subpath: str) -> str:
     os.environ[var_name] = str(p)
     return str(p)
 
-# Ujednolić ścieżki z .env (względne -> absolutne)
 resolve_env_path("KAGGLE_CONFIG_DIR", "Airflow/secrets")
 resolve_env_path("KAGGLE_DEST_DIR", "Airflow/data/datasets")
 
 
-# -------------------- Helpers --------------------
 def env(name: str, default: str | None = None, required: bool = False) -> str:
     val = os.getenv(name, default)
     if required and (val is None or val == ""):
         raise RuntimeError(f"Missing required environment variable: {name}")
     return val
 
-# -------------------- Kaggle download --------------------
 def download_kaggle_dataset(dataset_slug: str, dest_dir: str) -> List[Path]:
     dest = Path(dest_dir)
     dest.mkdir(parents=True, exist_ok=True)
@@ -57,9 +53,6 @@ def download_kaggle_dataset(dataset_slug: str, dest_dir: str) -> List[Path]:
             zip_ref.extractall(dest)
         z.unlink(missing_ok=True)
 
-    # csvs = list(dest.rglob("*.csv"))
-    # if not csvs:
-    #     raise RuntimeError(f"Brak plików CSV po pobraniu datasetu {dataset_slug} do {dest}")
 
 def run_datagen():
     dataset_slug = env("KAGGLE_DATASET", required=True)
