@@ -1,0 +1,5 @@
+# Use Confluent Kafka Connect image as base (includes Avro converters)
+FROM confluentinc/cp-kafka-connect:7.5.0
+
+# Install Debezium PostgreSQL connector (2.5.x) z Confluent Hub
+RUN confluent-hub install --no-prompt debezium/debezium-connector-postgresql:2.5.4

@@ -1,0 +1,73 @@
+docker-compose up --build
+
+W pgadmin zrobić insert do "eduational_data"
+
+zobaczyć zmianę w data_source.public.educational_data
+
+http://localhost:9000 -> kafkadrop
+http://localhost:4040/jobs/
+
+
+
+PIERWSZE KROKI JAKIE SIĘ ROBI PO POPRAWNYM ŚCIĄGNIĘCIU PROJEKTU:
+
+
+- pierwszy raz:
+docker compose down -v        # zatrzymaj stare kontenery
+docker compose up -d --build     # pierwszy raz
+
+INSERT INTO:
+
+SELECT * FROM educational_data;
+INSERT INTO "educational_data"
+    ("Full Name",
+     "Age",
+     "Education Level",
+     "Major",
+     "Year Started Education",
+     "Year Completed Education",
+     "Type of Educational Institution",
+     "Average Grade")
+VALUES
+    ('John DoeAAAAAAA',
+     22,
+     'Tertiary',
+     'Computer Science',
+     2018,
+     2022,
+     'Public',
+     3.5);
+
+
+POKAZUJE ZMIANY SPARKA (tak samo jak docker desktop):
+docker logs -f spark
+
+
+
+MinIO dostępne na http://localhost:9101 (login: minioadmin),
+PAMIETAJ ŻEBY ZROBIĆ SOBIE BUCKETA JEŚLI GO NIE MASZ -> polecam nazwę "spark-output"
+
+możesz zawsze w command linie sprawdzić jak się dodają nowe rzeczy:
+najpierw musisz wpisać:
+.\mc.exe alias set local http://localhost:9100 minioadmin minioadmin
+a potem:
+ .\mc ls --recursive local/spark-output/educational-data
+
+
+gdyby było jakieś problemy z MinIO consoli
+
+
+
+
+
+
+ curl.exe -s "http://localhost:8081/subjects/data_source.public.educational_data-value/versions/latest" | python -m json.tool
+
+curl.exe -s "http://localhost:8081/subjects/data_source.public.educational_data-value/versions/latest" ^ | python -c "import sys, json, pprint; outer=json.load(sys.stdin); pprint.pp(json.loads(outer['schema']))"
+
+
+     # build & (if spark not yet running) start the stack
+docker compose up -d --build
+
+
+docker compose exec spark spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-avro_2.12:3.5.0 /opt/spark-jobs/kafka_avro_transform.py
