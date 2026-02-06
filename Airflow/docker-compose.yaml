@@ -8,9 +8,11 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-meta:5432/airflow
+    MLFLOW_TRACKING_URI: http://mlflow:5000
 #    _PIP_ADDITIONAL_REQUIREMENTS: |
 #      -r /opt/airflow/requirements.txt
-  user: "${AIRFLOW_UID:-50000}:0"
+
+  user: "${AIRFLOW_UID:-50000}:0" # <-- To zakomentuj lub usuń
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
@@ -21,6 +23,7 @@ x-airflow-common: &airflow-common
     - ./secrets:/opt/airflow/secrets
     - ./data:/opt/airflow/data
     - ./gx:/opt/airflow/gx
+    - ./mlflow_data:/mlflow
   depends_on:
     postgres-meta:
       condition: service_healthy
@@ -184,33 +187,50 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
     ports:
       - "8081:8081"
-
-
+# ------------------ MLflow ------------------
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.18.0
+    container_name: mlflow_server
+    user: root
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_BACKEND_STORE_URI: sqlite:////mlflow/mlflow.db
+      MLFLOW_DEFAULT_ARTIFACT_ROOT: /mlflow/artifacts
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --host 0.0.0.0
+      --port 5000
+      --default-artifact-root /mlflow/artifacts
+    volumes:
+      - ./mlflow_data:/mlflow
+    healthcheck:
+      # ZMIANA: Używamy Pythona zamiast curla
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+# ------------------ Model AI API (FastAPI) ------------------
+  model-api:
+    <<: *airflow-common
+    container_name: model_api
+    # KLUCZOWA ZMIANA: Resetujemy entrypoint, żeby nie sprawdzał bazy Airflowa
+    entrypoint: []
+    # Uruchamiamy komendę bezpośrednio w bashu
+    command: >
+      /bin/bash -c "uvicorn jobs.model_serving_api:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      PYTHONPATH: /opt/airflow
+    depends_on:
+      mlflow:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   postgres_meta_data:
   postgres_data:
   kafka_data:
-
-## W pliku docker-compose.yml
-#
-## W pliku docker-compose.yml
-#
-#  spark:
-#    # Używamy oficjalnego obrazu Apache Spark (3.5.1 jest stabilny)
-#    image: apache/spark:3.5.1
-#    container_name: spark
-#    depends_on:
-#     - kafka
-#    volumes:
-#      # Mapowania pozostają takie same, jak planowaliśmy dla DockerOperator:
-#     - ./jobs:/opt/spark/jobs
-#     - ./data:/opt/spark/data
-#    environment:
-#      # Dodajemy zmienną, którą potem wykorzystamy do SPARK_HOME, aby spark-submit działał poprawnie
-#      SPARK_HOME: /opt/spark
-#    restart: unless-stopped
-#
-#
-#
-#

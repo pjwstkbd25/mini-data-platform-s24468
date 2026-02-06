@@ -6,20 +6,16 @@ from pathlib import Path
 # --- KONFIGURACJA ŚCIEŻEK ---
 AIRFLOW_HOME = Path("/opt/airflow")
 SILVER_BASE_DIR = AIRFLOW_HOME / "data/datalake/silver"
-GX_ROOT_DIR = AIRFLOW_HOME / "gx"  # <--- WSKAZUJEMY KONKRETNY FOLDER
+GX_ROOT_DIR = AIRFLOW_HOME / "gx"
 DATA_FOLDER = "mental_health"
 
 
 def run_job():
     print(">>> [Start] Silver Quality Check (Great Expectations)")
 
-    # 1. Kontekst GX - WYMUSZENIE ŚCIEŻKI
-    # Mówimy: "Twój dom jest w /opt/airflow/gx".
     print(f">>> Inicjalizacja kontekstu w: {GX_ROOT_DIR}")
     context = gx.get_context(mode="file", project_root_dir=GX_ROOT_DIR)
 
-    # Jeśli folder był pusty, GX zwróci kontekst Ephemeral (tymczasowy).
-    # Musimy go wtedy "zakotwiczyć" na dysku.
     if isinstance(context, EphemeralDataContext):
         print(">>> Konwersja kontekstu tymczasowego na plikowy...")
         context = context.convert_to_file_context()
@@ -77,9 +73,15 @@ def run_job():
 
     suite.add_expectation(gx.expectations.ExpectColumnToExist(column="gender_vec"))
     # --------------
-
+    print(">>> Zapisywanie zestawu reguł (Suite Save)...")
+    suite.save()
     # 6. Walidacja
     validation_name = "silver_validation_run"
+    try:
+        context.validation_definitions.delete(validation_name)
+        print(f">>> Usunięto stare: {validation_name}")
+    except Exception:
+        pass
     validation = gx.ValidationDefinition(
         data=batch_def,
         suite=suite,

@@ -1,0 +1,112 @@
+{
+  "expectations": [
+    {
+      "id": "aba293c8-2453-4db1-b370-2b3ed79bc2f1",
+      "kwargs": {
+        "min_value": 1
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_table_row_count_to_be_between"
+    },
+    {
+      "id": "49cd35ed-691c-4edc-a6c7-47509f6e670e",
+      "kwargs": {
+        "column": "age",
+        "max_value": 100.0,
+        "min_value": 15.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "66a98a00-0f11-400d-b932-c72107933479",
+      "kwargs": {
+        "column": "depression",
+        "value_set": [
+          "Yes",
+          "No",
+          "yes",
+          "no",
+          "0",
+          "1",
+          0,
+          1
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "b89f31b1-760a-4887-8f63-6176d90fc87c",
+      "kwargs": {
+        "column": "gender"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "f1116e65-5816-427c-a308-0fad5b4a12ff",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "7cddcaaf-0ab1-4f32-94f1-a351a5c7c973",
+      "kwargs": {
+        "column": "sleep duration"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "4a93df9a-b012-4453-a9da-13d5a62889fd",
+      "kwargs": {
+        "column": "dietary habits"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "eee00668-1ce8-4616-8f06-001b63ecac41",
+      "kwargs": {
+        "column": "financial stress"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "55ed1895-4d3e-446d-8aa0-b78699cac984",
+      "kwargs": {
+        "column": "depression"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "5ccece22-5bc8-4cc0-9aad-a9886282a8e3",
+      "kwargs": {
+        "column": "gender_vec"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    }
+  ],
+  "id": "acdf7047-2347-42d6-9710-26867e8376d8",
+  "meta": {
+    "great_expectations_version": "1.9.2"
+  },
+  "name": "silver_mental_health_suite",
+  "notes": null
+}
