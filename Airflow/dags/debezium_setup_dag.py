@@ -6,7 +6,7 @@ DEFAULT_ARGS = {"owner": "airflow", "retries": 0}
 AIRFLOW_HOME = "/opt/airflow"
 SECRETS_DIR  = f"{AIRFLOW_HOME}/secrets"
 DATASETS_DIR = f"{AIRFLOW_HOME}/data/datasets"
-TASKS_DIR = f"{AIRFLOW_HOME}/tasks"
+TASKS_DIR = f"{AIRFLOW_HOME}/jobs"
 with DAG(
     dag_id="debezium_register_connector",
     start_date=datetime(2025, 1, 1),
@@ -29,3 +29,4 @@ with DAG(
     )
 
     wait_connect >> register
+

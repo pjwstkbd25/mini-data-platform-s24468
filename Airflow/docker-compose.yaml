@@ -1,24 +1,26 @@
 version: "3.8"
 
 x-airflow-common: &airflow-common
-  image: apache/airflow:2.10.2-python3.11
+#  image: apache/airflow:2.10.2-python3.11
+  build: .
   env_file: .env
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__LOAD_EXAMPLES: "False"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-meta:5432/airflow
-    _PIP_ADDITIONAL_REQUIREMENTS: |
-      -r /opt/airflow/requirements.txt
+#    _PIP_ADDITIONAL_REQUIREMENTS: |
+#      -r /opt/airflow/requirements.txt
   user: "${AIRFLOW_UID:-50000}:0"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./requirements.txt:/opt/airflow/requirements.txt
+#    - ./requirements.txt:/opt/airflow/requirements.txt
     - /var/run/docker.sock:/var/run/docker.sock
     - ./jobs:/opt/airflow/jobs
     - ./secrets:/opt/airflow/secrets
     - ./data:/opt/airflow/data
+    - ./gx:/opt/airflow/gx
   depends_on:
     postgres-meta:
       condition: service_healthy
@@ -43,14 +45,14 @@ services:
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
+#    echo "Installing extras...";
+#    pip install --no-cache-dir -r /opt/airflow/requirements.txt;
     command:
       - -lc
       - >
         set -euo pipefail;
         echo "Waiting for Postgres...";
         until pg_isready -h postgres-meta -U airflow -d airflow; do sleep 1; done;
-        echo "Installing extras...";
-        pip install --no-cache-dir -r /opt/airflow/requirements.txt;
         echo "Migrating DB...";
         airflow db migrate;
         echo "Creating admin (idempotent)...";
@@ -183,7 +185,32 @@ services:
     ports:
       - "8081:8081"
 
+
+
 volumes:
   postgres_meta_data:
   postgres_data:
   kafka_data:
+
+## W pliku docker-compose.yml
+#
+## W pliku docker-compose.yml
+#
+#  spark:
+#    # Używamy oficjalnego obrazu Apache Spark (3.5.1 jest stabilny)
+#    image: apache/spark:3.5.1
+#    container_name: spark
+#    depends_on:
+#     - kafka
+#    volumes:
+#      # Mapowania pozostają takie same, jak planowaliśmy dla DockerOperator:
+#     - ./jobs:/opt/spark/jobs
+#     - ./data:/opt/spark/data
+#    environment:
+#      # Dodajemy zmienną, którą potem wykorzystamy do SPARK_HOME, aby spark-submit działał poprawnie
+#      SPARK_HOME: /opt/spark
+#    restart: unless-stopped
+#
+#
+#
+#
